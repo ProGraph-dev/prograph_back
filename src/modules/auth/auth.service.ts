@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/entity/user.entity';
@@ -29,6 +29,33 @@ export class AuthService {
       const jwt = sign({ id: user.id }, process.env.JWT_SECRET);
       return {
         statusCode: HttpStatus.CREATED,
+        response: { token: jwt, user: user },
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async login({
+    email,
+    password,
+  }: DeepPartial<User>): Promise<ResponseModel<{ token: string; user: User }>> {
+    try {
+      let user = await this._userRepo.findOne({
+        where: { email },
+        select: { id: true, email: true, password: true },
+      });
+      if (user == null) {
+        throw new BadRequestException('Something is wrong');
+      }
+      const compare = bcrypt.compare(password, user.password);
+      if (!compare) {
+        throw new BadRequestException('Something is wrong');
+      }
+      user = await this._userRepo.findOne({ where: { id: user.id } });
+      const jwt = sign({ id: user.id }, process.env.JWT_SECRET);
+      return {
+        statusCode: HttpStatus.OK,
         response: { token: jwt, user: user },
       };
     } catch (err) {

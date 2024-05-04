@@ -1,19 +1,20 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { User } from '../user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private _authService: AuthService) {}
 
   @Post('/registration')
-  private async registration(@Body() { email, password }) {
+  private async registration(@Body() { email, password }: User) {
     try {
-      const userRes = await this._authService.registreation({
+      const regRes = await this._authService.registreation({
         email,
         password,
       });
-      if (userRes.statusCode == HttpStatus.CREATED) {
-        return userRes;
+      if (regRes.statusCode == HttpStatus.CREATED) {
+        return regRes;
       }
     } catch (err) {
       throw err;
@@ -21,8 +22,12 @@ export class AuthController {
   }
 
   @Post('/login')
-  private async Login() {
+  private async Login(@Body() { email, password }: User) {
     try {
+      const loginRes = await this._authService.login({ email, password });
+      if (loginRes.statusCode == HttpStatus.OK) {
+        return loginRes;
+      }
     } catch (err) {
       throw err;
     }
