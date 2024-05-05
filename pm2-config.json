@@ -1,0 +1,8 @@
+{
+    "apps": [
+        {
+            "cwd": "/home/ag/Desktop/Projects/ProGraph/prograph_back/dist",
+            "script": "main.js"
+        }
+    ]
+}
