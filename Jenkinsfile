@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                sh "npm i"
                 sh "npm run build"
                 sh "rm -ri /home/ag/Desktop/Projects/ProGraph/prograph_back/dist"
             }
