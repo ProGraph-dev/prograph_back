@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh "npm i"
                 sh "npm run build"
-                sh "rm -ri /home/ag/Desktop/Projects/ProGraph/prograph_back/dist"
+                sh "dirname /home/ag/Desktop/Projects/ProGraph/prograph_back/dist"
             }
         }
 
