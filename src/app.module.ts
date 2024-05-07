@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
+import { ProfessionModule } from './modules/proffesion/profession.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
     }),
     UserModule,
     AuthModule,
+    ProfessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
