@@ -26,7 +26,10 @@ export class AuthService {
         email,
         password: hashedPassword,
       });
-      const jwt = sign({ id: user.id }, process.env.JWT_SECRET);
+      const jwt = sign(
+        { id: user.id, userRole: user.userRole },
+        process.env.JWT_SECRET,
+      );
       return {
         statusCode: HttpStatus.CREATED,
         response: { token: jwt, user: user },
@@ -53,7 +56,10 @@ export class AuthService {
         throw new BadRequestException('Something is wrong');
       }
       user = await this._userRepo.findOne({ where: { id: user.id } });
-      const jwt = sign({ id: user.id }, process.env.JWT_SECRET);
+      const jwt = sign(
+        { id: user.id, userRole: user.userRole },
+        process.env.JWT_SECRET,
+      );
       return {
         statusCode: HttpStatus.OK,
         response: { token: jwt, user: user },

@@ -1,5 +1,6 @@
+import { Profession } from 'src/modules/proffesion/entity/profession.entity';
 import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -23,4 +24,7 @@ export class User {
 
   @Column({ type: 'varchar', select: false })
   password: string;
+
+  @ManyToMany(() => Profession, { onDelete: 'SET NULL' })
+  profession: Profession[];
 }

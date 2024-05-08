@@ -23,9 +23,9 @@ export class ProfessionService {
   }): Promise<ResponseModel<Profession>> {
     try {
       const exist = await this._professionRepo.exists({ where: { title } });
-      if (!exist) {
+      if (exist) {
         throw new BadRequestException(
-          'Profession with title ${title} is exist',
+          `Profession with title ${title} is exist`,
         );
       }
       let profession = { title, description, users: [] } as Profession;
@@ -46,7 +46,7 @@ export class ProfessionService {
       if (!profession) {
         throw new NotFoundException('Profession is not found');
       }
-      if ((profession.title = title)) {
+      if (profession.title == title) {
         throw new BadRequestException(
           `Profession with title ${title} is exist`,
         );
@@ -86,12 +86,13 @@ export class ProfessionService {
     take: number,
   ): Promise<ResponseModel<{ list: Profession[]; count: number }>> {
     try {
-      const [list, count] = await this._professionRepo
-        .createQueryBuilder('repo')
-        .andWhere('repo.title  LIKE :title', { title })
-        .skip(skip)
-        .take(take)
-        .getManyAndCount();
+      const query = this._professionRepo.createQueryBuilder('repo');
+      if (title) {
+        query.andWhere('LOWER(repo.title) LIKE LOWER(:title)', {
+          title: '%' + title.toLowerCase() + '%',
+        });
+      }
+      const [list, count] = await query.skip(skip).take(take).getManyAndCount();
       return { statusCode: HttpStatus.OK, response: { list, count } };
     } catch (err) {
       throw err;

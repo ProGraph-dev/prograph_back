@@ -18,7 +18,7 @@ export class Profession {
   @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { onDelete: 'SET NULL' })
   @JoinTable()
   users: User[];
 }
