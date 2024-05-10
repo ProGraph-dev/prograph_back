@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
 import { ProfessionModule } from './modules/proffesion/profession.module';
+import { LanguageModule } from './modules/language/language.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ProfessionModule } from './modules/proffesion/profession.module';
     UserModule,
     AuthModule,
     ProfessionModule,
+    LanguageModule
   ],
   controllers: [AppController],
   providers: [AppService],
