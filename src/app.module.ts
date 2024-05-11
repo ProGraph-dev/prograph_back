@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
 import { ProfessionModule } from './modules/proffesion/profession.module';
 import { SocialsModule } from './modules/socials/socials.module';
+import { LanguageModule } from './modules/language/language.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SocialsModule } from './modules/socials/socials.module';
     AuthModule,
     ProfessionModule,
     SocialsModule,
+    LanguageModule
   ],
   controllers: [AppController],
   providers: [AppService],
