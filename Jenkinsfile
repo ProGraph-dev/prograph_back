@@ -27,6 +27,7 @@ pipeline {
                     }
                     catch(Exception e){}
 
+                    sh "cd /home/ag/Desktop/Projects/ProGraph/prograph_back/dist"
                     sh "pm2 start /home/ag/Desktop/Projects/ProGraph/prograph_back/dist/main.js --name ${branch}_back"
                 }
             }   
