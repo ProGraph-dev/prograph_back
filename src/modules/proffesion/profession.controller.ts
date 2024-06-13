@@ -19,9 +19,13 @@ export class ProfessionController {
 
   @Post('/create')
   @UseGuards(IsAdminGuard)
-  private async createProfession(@Body() { title, description }) {
+  private async createProfession(@Body() { title, description, ISO }) {
     try {
-      const proRes = await this._professionService.save({ title, description });
+      const proRes = await this._professionService.save({
+        title,
+        description,
+        ISO,
+      });
       if (proRes.statusCode == HttpStatus.CREATED) {
         return proRes;
       }
@@ -32,12 +36,13 @@ export class ProfessionController {
 
   @Put('/update/:id')
   @UseGuards(IsAdminGuard)
-  private async update(@Param('id') id, @Body() { title, description }) {
+  private async update(@Param('id') id, @Body() { title, description, ISO }) {
     try {
       const updateRes = await this._professionService.update({
         id,
         title,
         description,
+        ISO,
       });
       if (updateRes.statusCode == HttpStatus.OK) {
         return updateRes;

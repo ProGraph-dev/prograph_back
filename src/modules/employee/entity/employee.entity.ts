@@ -2,25 +2,25 @@ import { User } from 'src/modules/user/entity/user.entity';
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('profession')
-export class Profession {
+@Entity('employee')
+export class Employee {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
-  title: string;
-
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'text' })
   description: string;
 
-  @ManyToMany(() => User, { onDelete: 'SET NULL' })
-  @JoinTable()
-  users: User[];
+  @Column({ type: 'varchar' })
+  photo: number;
+
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column({ type: 'varchar', default: 'EN' })
   ISO: string;

@@ -20,6 +20,7 @@ export class ProfessionService {
   public async save({
     title,
     description,
+    ISO,
   }): Promise<ResponseModel<Profession>> {
     try {
       const exist = await this._professionRepo.exists({ where: { title } });
@@ -28,7 +29,7 @@ export class ProfessionService {
           `Profession with title ${title} is exist`,
         );
       }
-      let profession = { title, description, users: [] } as Profession;
+      let profession = { title, description, ISO, users: [] } as Profession;
       profession = await this._professionRepo.save(profession);
       return { statusCode: HttpStatus.CREATED, response: profession };
     } catch (err) {
@@ -40,6 +41,7 @@ export class ProfessionService {
     id,
     title,
     description,
+    ISO,
   }: DeepPartial<Profession>): Promise<ResponseModel<Profession>> {
     try {
       let profession = await this._professionRepo.findOne({ where: { id } });
@@ -53,7 +55,7 @@ export class ProfessionService {
       }
       const updateData = await this._professionRepo.update(
         { id },
-        { title, description },
+        { title, description, ISO },
       );
       if (updateData.raw !== 0) {
         profession = await this._professionRepo.findOne({ where: { id } });

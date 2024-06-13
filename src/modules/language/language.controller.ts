@@ -90,14 +90,14 @@ export class LanguageController {
 
   @Delete('/delete/:id')
   @UseGuards(IsAdminGuard)
-  private async delete(@Param('id') id){
-    try{
-        const deleteRes = await this._languageService.delete({id});
-        if(deleteRes.statusCode == HttpStatus.NO_CONTENT){
-            return deleteRes;
-        }
-    }catch(err){
-        throw err
+  private async delete(@Param('id') id) {
+    try {
+      const deleteRes = await this._languageService.delete({ id });
+      if (deleteRes.statusCode == HttpStatus.NO_CONTENT) {
+        return deleteRes;
+      }
+    } catch (err) {
+      throw err;
     }
   }
 }

@@ -1,6 +1,13 @@
+import { Employee } from 'src/modules/employee/entity/employee.entity';
 import { Profession } from 'src/modules/proffesion/entity/profession.entity';
 import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -27,4 +34,7 @@ export class User {
 
   @ManyToMany(() => Profession, { onDelete: 'SET NULL' })
   profession: Profession[];
+
+  @OneToOne(() => Employee)
+  employeeDesc: Employee;
 }

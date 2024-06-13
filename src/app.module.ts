@@ -9,6 +9,7 @@ import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
 import { ProfessionModule } from './modules/proffesion/profession.module';
 import { SocialsModule } from './modules/socials/socials.module';
 import { LanguageModule } from './modules/language/language.module';
+import { EmployeeModule } from './modules/employee/employee.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { LanguageModule } from './modules/language/language.module';
     AuthModule,
     ProfessionModule,
     SocialsModule,
-    LanguageModule
+    LanguageModule,
+    EmployeeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
