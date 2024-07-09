@@ -1,6 +1,7 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from '../user/entity/user.entity';
+import { CurrentUser } from 'src/utils/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +32,10 @@ export class AuthController {
     } catch (err) {
       throw err;
     }
+  }
+
+  @Post('/test')
+  public async test(@CurrentUser() user: User) {
+    return user;
   }
 }
