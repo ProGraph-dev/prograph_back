@@ -1,7 +1,8 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from '../user/entity/user.entity';
 import { CurrentUser } from 'src/utils/decorators/current-user.decorator';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -23,12 +24,14 @@ export class AuthController {
   }
 
   @Post('/login')
-  private async Login(@Body() { email, password }: User) {
+  private async Login(@Body() { email, password }: User, @Res() res: Response) {
     try {
       const loginRes = await this._authService.login({ email, password });
-      if (loginRes.statusCode == HttpStatus.OK) {
-        return loginRes;
-      }
+      if (loginRes.statusCode == HttpStatus.OK) {        
+        res.cookie('access_token', loginRes.response.token, { httpOnly: true });        
+
+        return res.status(HttpStatus.OK).send(loginRes);
+      }      
     } catch (err) {
       throw err;
     }
