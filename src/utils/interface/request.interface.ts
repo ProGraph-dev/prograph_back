@@ -5,4 +5,6 @@ export interface ReqInterface extends Request {
   cookies: CookieModel;
   cookie: CookieModel;
   user: User;
+  params: any;
+  raw: any;
 }

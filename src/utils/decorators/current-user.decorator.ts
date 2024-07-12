@@ -7,14 +7,10 @@ export const CurrentUser = createParamDecorator(
   (data: any, ctx: ExecutionContext) => {
     const req = ctx.switchToHttp().getRequest<ReqInterface>();
     try {
-      console.log(req);
-      if (!req.user) {
+      if (!req.raw.user) {
         throw new UnauthorizedException('CurrentUser is undefined');
       }
-      if (data) {
-        return req.user[data];
-      }
-      return req.user;
+      return req.raw.user;
     } catch (err) {
       if (err instanceof UnauthorizedException) {
         throw err;

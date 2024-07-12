@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { AuthMiddleWare } from './utils/middlewares/auth.middleware';
+import { AuthMiddleware } from './utils/middlewares/auth.middleware';
 import { ProfessionModule } from './modules/proffesion/profession.module';
 import { SocialsModule } from './modules/socials/socials.module';
 import { LanguageModule } from './modules/language/language.module';
@@ -38,7 +38,7 @@ import { EmployeeModule } from './modules/employee/employee.module';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleWare).forRoutes({
+    consumer.apply(AuthMiddleware).forRoutes({
       path: '*',
       method: RequestMethod.ALL,
     });

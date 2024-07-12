@@ -27,11 +27,10 @@ export class AuthController {
   private async Login(@Body() { email, password }: User, @Res() res: Response) {
     try {
       const loginRes = await this._authService.login({ email, password });
-      if (loginRes.statusCode == HttpStatus.OK) {        
-        res.cookie('access_token', loginRes.response.token, { httpOnly: true });        
-
+      if (loginRes.statusCode == HttpStatus.OK) {
+        res.cookie('access_token', loginRes.response.token, { httpOnly: true });
         return res.status(HttpStatus.OK).send(loginRes);
-      }      
+      }
     } catch (err) {
       throw err;
     }
