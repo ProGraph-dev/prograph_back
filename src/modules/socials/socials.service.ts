@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   HttpStatus,
   Injectable,
@@ -91,8 +92,13 @@ export class SocialsService {
         throw new NotFoundException('Socials is not found');
       }
       const delRes = await this._socialsRepo.delete({ id });
-      if (delRes.raw !== 0) {
-        return {};
+      if (delRes.affected !== 0) {
+        return {
+          statusCode: HttpStatus.NO_CONTENT,
+          message: 'Content successfully deleted',
+        };
+      } else {
+        throw new BadGatewayException('Somethink is wrong');
       }
     } catch (err) {
       throw err;
