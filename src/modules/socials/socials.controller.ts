@@ -19,12 +19,13 @@ export class SocialsController {
 
   @Post('/create')
   @UseGuards(IsAdminGuard)
-  private async createAchievement(@Body() { link, title, icon }) {
+  private async createAchievement(@Body() { link, title, icon, ISO }) {
     try {
       const saveRes = await this._socialsService.save({
         link,
         title,
         icon,
+        ISO,
       });
       if (saveRes.statusCode == HttpStatus.CREATED) {
         return saveRes;
@@ -61,7 +62,7 @@ export class SocialsController {
   @Put('/update/:id')
   @UseGuards(IsAdminGuard)
   private async updateAchievement(
-    @Body() { icon, link, title },
+    @Body() { icon, link, title, ISO },
     @Param('id') id,
   ) {
     try {
@@ -70,6 +71,7 @@ export class SocialsController {
         icon,
         link,
         title,
+        ISO,
       });
       if (updateRes.statusCode == HttpStatus.OK) {
         return updateRes;

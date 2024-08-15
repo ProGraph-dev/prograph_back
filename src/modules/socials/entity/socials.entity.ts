@@ -13,4 +13,7 @@ export class Socials {
 
   @Column({ type: 'varchar' })
   title: string;
+
+  @Column({ type: 'varchar', default: 'EN' })
+  ISO: string;
 }
