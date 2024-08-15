@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserRoleEnum } from '../enums/user-role.enum';
+import { ReqInterface } from '../interface/request.interface';
 
 @Injectable()
 export class IsAdminGuard implements CanActivate {
@@ -13,12 +14,12 @@ export class IsAdminGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     try {
-      const request = context.switchToHttp().getRequest();
+      const request = context.switchToHttp().getRequest<ReqInterface>();
       let isAdmin;
-      if (!request.user) {
+      if (!request.raw.user) {
         throw new UnauthorizedException('User is unauthorized');
       }
-      if (request.user.userRole <= UserRoleEnum.ADMIN) {
+      if (request.raw.user.userRole <= UserRoleEnum.ADMIN) {
         isAdmin = true;
       } else {
         isAdmin = false;

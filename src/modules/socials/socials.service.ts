@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   HttpStatus,
   Injectable,
@@ -19,13 +20,14 @@ export class SocialsService {
     link,
     title,
     icon,
+    ISO,
   }: DeepPartial<Socials>): Promise<ResponseModel<Socials>> {
     try {
       const exists = await this._socialsRepo.exists({ where: { title } });
       if (exists) {
         throw new BadRequestException(`Socials with ${title} title is exist`);
       }
-      const saveRes = await this._socialsRepo.save({ link, title, icon });
+      const saveRes = await this._socialsRepo.save({ link, title, icon, ISO });
       return { statusCode: HttpStatus.CREATED, response: saveRes };
     } catch (err) {
       throw err;
@@ -37,6 +39,7 @@ export class SocialsService {
     icon,
     link,
     title,
+    ISO,
   }: DeepPartial<Socials>): Promise<ResponseModel<Socials>> {
     try {
       const existsId = await this._socialsRepo.exists({ where: { id } });
@@ -47,7 +50,7 @@ export class SocialsService {
       if (existsTitle) {
         throw new BadRequestException('Socials with same title is exist');
       }
-      await this._socialsRepo.update({ id }, { icon, link, title });
+      await this._socialsRepo.update({ id }, { icon, link, title, ISO });
       const socials = await this._socialsRepo.findOne({ where: { id } });
       return { statusCode: HttpStatus.OK, response: socials };
     } catch (err) {
@@ -91,8 +94,13 @@ export class SocialsService {
         throw new NotFoundException('Socials is not found');
       }
       const delRes = await this._socialsRepo.delete({ id });
-      if (delRes.raw !== 0) {
-        return {};
+      if (delRes.affected !== 0) {
+        return {
+          statusCode: HttpStatus.NO_CONTENT,
+          message: 'Content successfully deleted',
+        };
+      } else {
+        throw new BadGatewayException('Somethink is wrong');
       }
     } catch (err) {
       throw err;
