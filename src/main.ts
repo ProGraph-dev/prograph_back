@@ -28,8 +28,8 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
   });
 
-  app.use(cookieParser())
+  app.use(cookieParser());
 
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT, '0.0.0.0');
 }
 bootstrap();
