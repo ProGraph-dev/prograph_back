@@ -109,7 +109,7 @@ export class EmployeeService {
         throw new NotFoundException('Employee info is not found');
       }
       const deleteRes = await this._employee.delete({ id });
-      if (deleteRes.raw !== 0) {
+      if (deleteRes.affected !== 0) {
         return {
           statusCode: HttpStatus.NO_CONTENT,
           message: 'Content successfully deleted',
