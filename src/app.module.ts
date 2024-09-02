@@ -10,6 +10,7 @@ import { ProfessionModule } from './modules/proffesion/profession.module';
 import { SocialsModule } from './modules/socials/socials.module';
 import { LanguageModule } from './modules/language/language.module';
 import { EmployeeModule } from './modules/employee/employee.module';
+import { ProductTypeModule } from './modules/product-type/product-type.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EmployeeModule } from './modules/employee/employee.module';
     SocialsModule,
     LanguageModule,
     EmployeeModule,
+    ProductTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
