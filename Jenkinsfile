@@ -22,6 +22,7 @@ pipeline {
                     def branch = currentBuild.projectName
 
                     try{
+                        sh "pwd"
                         sh "pm2 delete ${branch}_back"
                         sh "cd /home/prograph/Desktop/ProGraph/ && cp -r dist prograph_back"
                     }
