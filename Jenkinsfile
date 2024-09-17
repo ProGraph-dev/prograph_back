@@ -23,7 +23,7 @@ pipeline {
 
                     try{
                         sh "pm2 delete ${branch}_back"
-                        sh "mv dist /home/prograph/Desktop/ProGraph/prograph_back"
+                        sh "sudo mv dist /home/prograph/Desktop/ProGraph/prograph_back"
                     }
                     catch(Exception e){}
 
