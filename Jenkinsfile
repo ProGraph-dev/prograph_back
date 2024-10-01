@@ -19,14 +19,7 @@ pipeline {
         stage('Run') {
             steps {
                 script {
-                    try{
-                        sh "pwd"
-                        sh "pm2 delete prograph_back"
-                        sh "cp -r dist prograph_back"
-                    }
-                    catch(Exception e){}
-
-                    sh "pm2 start ./dist/main.js --name prograph_back"
+                    sh "npm run start:prod"
                 }
             }   
         }
