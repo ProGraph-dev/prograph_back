@@ -36,21 +36,15 @@ pipeline {
         success {
             script {
                 def curlCmd = '''curl -X POST -H "Content-Type: application/json" -d '{"chat_id": "4225385520", "text": "[🎉SUCCESS] Backend build succeeded! 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", "disable_notification": false}' https://api.telegram.org/bot7541177344:AAHjoqOz59t31P202BUzQ5agy-ViEYp2uAY/sendMessage'''
-                def result = sh(script: curlCmd, returnStdout: true, returnStatus: true)
-                echo "Curl command output: ${result.stdout}"
-                if (result.returnStatus != 0) {
-                    error("Curl command failed with exit code ${result.returnStatus}")
-                }
+                def response = sh(script: curlCmd, returnStdout: true).trim()
+                echo "Curl command output: ${response}"
             }
         }
         failure {
             script {
                 def curlCmd = '''curl -X POST -H "Content-Type: application/json" -d '{"chat_id": "4225385520", "text": "[💀FAILED] Backend build failed😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭!", "disable_notification": false}' https://api.telegram.org/bot7541177344:AAHjoqOz59t31P202BUzQ5agy-ViEYp2uAY/sendMessage'''
-                def result = sh(script: curlCmd, returnStdout: true, returnStatus: true)
-                echo "Curl command output: ${result.stdout}"
-                if (result.returnStatus != 0) {
-                    error("Curl command failed with exit code ${result.returnStatus}")
-                }
+                def response = sh(script: curlCmd, returnStdout: true).trim()
+                echo "Curl command output: ${response}"
             }
         }
     }
