@@ -15,6 +15,7 @@ pipeline {
                     if (!env.BRANCH_NAME.equals('alpha')) {
                         error("Aborting: The branch '${env.BRANCH_NAME}' is not allowed. Only 'alpha' is valid.")
                     }
+                    
                 }
             }
         }
