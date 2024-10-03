@@ -9,6 +9,11 @@ pipeline {
     
     stages {
         stage('Build') {
+            when {
+                anyOf {
+                    branch 'alpha'
+                }
+            }
             steps {
                 sh "npm i"
                 sh "npm run build"
