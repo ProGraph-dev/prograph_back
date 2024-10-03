@@ -8,12 +8,18 @@ pipeline {
     }
     
     stages {
-        stage('Build') {
-            when {
-                anyOf {
-                    branch 'alpha'
+        stage('Validate Branch') {
+            steps {
+                script {
+                    sh "echo '${env.BRANCH_NAME}'"
+                    if (!env.BRANCH_NAME.equals('alpha')) {
+                        error("Aborting: The branch '${env.BRANCH_NAME}' is not allowed. Only 'alpha' is valid.")
+                    }
                 }
             }
+        }
+
+        stage('Build') {
             steps {
                 sh "npm i"
                 sh "npm run build"
