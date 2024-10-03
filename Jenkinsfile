@@ -12,11 +12,10 @@ pipeline {
             steps {
                 script {
                     sh "echo '${GIT_BRANCH}'"
-                    
+
                     if (!GIT_BRANCH.equals('alpha')) {
                         error("Aborting: The branch '${GIT_BRANCH}' is not allowed. Only 'alpha' is valid.")
                     }
-
                 }
             }
         }
