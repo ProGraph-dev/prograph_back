@@ -11,7 +11,6 @@ pipeline {
         stage('Build & Run') {
             steps {
                 script {
-                    // Get the branch name
                     def branchName = env.GIT_BRANCH ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
                     sh "echo ${branchName}"
                     
