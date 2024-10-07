@@ -16,7 +16,13 @@ pipeline {
                     
                     // Compare against the correct branch name
                     if (branchName == 'origin/config') {
-                        sh "nvm use 20.10.0"
+                        sh "
+                            export NVM_DIR="$HOME/.nvm"
+                            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                            nvm install 20.10.0
+                            nvm use 20.10.0
+                            
+                        "
                         sh "npm i"
                         sh "npm run build"
                         // Start the application in a separate step
