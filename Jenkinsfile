@@ -81,7 +81,7 @@ pipeline {
                                 nvm use 20.10.0
 
                                 cd /home/prograph/Desktop/ProGraph
-                                mv .env /home/prograph/Desktop/ProGraph/ProGraph-Back
+                                cp .env /home/prograph/Desktop/ProGraph/ProGraph-Back
 
                                 cd /home/prograph/Desktop/ProGraph/ProGraph-Back
                                 npm install
