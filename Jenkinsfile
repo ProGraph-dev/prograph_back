@@ -86,7 +86,7 @@ pipeline {
                                 cd /home/prograph/Desktop/ProGraph/ProGraph-Back
                                 npm install
                                 npm run build
-                                npm run start:prod
+                                nohup npm run start:prod &
                             '''
                         }
                     } else {
