@@ -21,9 +21,18 @@ export class ProductController {
 
   @Post('/create')
   @UseGuards(IsAdminGuard)
-  private async createProfession(@Body() data: DeepPartial<Product>) {
+  private async createProfession(
+    @Body()
+    {
+      data,
+      productTypeId,
+    }: {
+      data: DeepPartial<Product>;
+      productTypeId: number;
+    },
+  ) {
     try {
-      const saveRes = await this._productService.save(data);
+      const saveRes = await this._productService.save(data, productTypeId);
       if (saveRes.statusCode == HttpStatus.CREATED) {
         return saveRes;
       }
@@ -46,10 +55,32 @@ export class ProductController {
     }
   }
 
+  @Put('/change-product-type/:id')
+  @UseGuards(IsAdminGuard)
+  private async changeProductType(
+    @Param('id') id,
+    @Body() { productTypeId }: { productTypeId: number },
+  ) {
+    try {
+      const product = await this._productService.getById({ id });
+      if (product.statusCode == HttpStatus.OK) {
+        const updateRes = await this._productService.changeProductType(
+          id,
+          productTypeId,
+        );
+        if (updateRes.statusCode == HttpStatus.OK) {
+          return updateRes;
+        }
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
   @Get('/list')
   private async getList(@Query() { skip, take, ISO }) {
     try {
-      const getRes = await this._productService.getList(skip, take, ISO);
+      const getRes = await this._productService.getList(+skip, +take, ISO);
       if (getRes.statusCode == HttpStatus.OK) {
         return getRes;
       }
