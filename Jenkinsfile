@@ -102,8 +102,8 @@ pipeline {
                                 export HOST=${NEXT_HOST}
         
                                 cd ${PROJECT_DIR}
-                                pm2 delete prograph_website || true
-                                pm2 start npm --name prograph_back -- run start -- -p ${APP_PORT} -H ${NEXT_HOST}
+                                pm2 delete prograph_back || true
+                                pm2 start npm --name prograph_back -- run start:prod -- -p ${APP_PORT} -H ${NEXT_HOST}
                                 pm2 save
                                 pm2 list
                                 "
