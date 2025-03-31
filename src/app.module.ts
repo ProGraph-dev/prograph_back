@@ -12,6 +12,7 @@ import { LanguageModule } from './modules/language/language.module';
 import { EmployeeModule } from './modules/employee/employee.module';
 import { ProductTypeModule } from './modules/product-type/product-type.module';
 import { ProductModule } from './modules/product/product.module';
+import { UploadModule } from './utils/modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ProductModule } from './modules/product/product.module';
     EmployeeModule,
     ProductModule,
     ProductTypeModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
