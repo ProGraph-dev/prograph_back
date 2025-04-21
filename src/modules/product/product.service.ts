@@ -1,5 +1,6 @@
 import {
   BadGatewayException,
+  BadRequestException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -18,9 +19,30 @@ export class ProductService {
 
   public async save(
     data: DeepPartial<Product>,
+    productTypeId: number,
   ): Promise<ResponseModel<Product>> {
     try {
-      const product = await this._productTypeRepo.save(data);
+      if (!productTypeId) {
+        throw new BadRequestException(`productTypeId is required`);
+      }
+      let product = await this._productTypeRepo.save(data);
+      await this._productTypeRepo.query(`
+          UPDATE public.product
+	        SET "productTypeId"= ${+productTypeId}
+	        WHERE id = ${product.id};
+        `);
+      product = await this._productTypeRepo.findOne({
+        where: { id: product.id },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          url: true,
+          ISO: true,
+          productType: { id: true, title: true },
+        },
+        relations: { productType: true },
+      });
       return { statusCode: HttpStatus.CREATED, response: product };
     } catch (err) {
       throw err;
@@ -44,11 +66,45 @@ export class ProductService {
       if (updateData.raw !== 0) {
         const getRes = await this._productTypeRepo.findOne({
           where: { id: data.id },
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            url: true,
+            ISO: true,
+            productType: { id: true, title: true },
+          },
+          relations: { productType: true },
         });
         return { statusCode: HttpStatus.OK, response: getRes };
       } else {
         throw new BadGatewayException('Somethink is wrong');
       }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async changeProductType(productId: number, typeId: number) {
+    try {
+      await this._productTypeRepo.query(`
+        UPDATE public.product
+        SET "productTypeId"= ${typeId}
+        WHERE id = ${productId};
+      `);
+      const product = await this._productTypeRepo.findOne({
+        where: { id: productId },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          url: true,
+          ISO: true,
+          productType: { id: true, title: true },
+        },
+        relations: { productType: true },
+      });
+      return { statusCode: HttpStatus.OK, response: product };
     } catch (err) {
       throw err;
     }
@@ -60,6 +116,7 @@ export class ProductService {
     try {
       const product = await this._productTypeRepo.findOne({
         where: { id },
+        relations: { productType: true },
       });
       if (product == null) {
         throw new NotFoundException('Data is not found');
@@ -79,6 +136,7 @@ export class ProductService {
     try {
       const query = this._productTypeRepo
         .createQueryBuilder('repo')
+        .leftJoinAndSelect('repo.productType', 'productType')
         .andWhere('repo.ISO = :ISO', { ISO });
       if (title) {
         query.andWhere('LOWER(repo.title) LIKE LOWER(:title)', {
@@ -98,9 +156,9 @@ export class ProductService {
   }
 
   public async getList(
-    ISO: string,
     skip: number,
     take: number,
+    ISO: string,
   ): Promise<ResponseModel<{ list: Product[]; count: number }>> {
     try {
       const [list, count] = await this._productTypeRepo.findAndCount({

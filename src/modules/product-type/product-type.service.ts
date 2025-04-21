@@ -109,9 +109,9 @@ export class ProductTypeService {
   }
 
   public async getList(
-    ISO: string,
     skip: number,
     take: number,
+    ISO: string,
   ): Promise<ResponseModel<{ list: ProductType[]; count: number }>> {
     try {
       const [list, count] = await this._productTypeRepo.findAndCount({

@@ -8,6 +8,8 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import * as cookieParser from 'cookie-parser';
+import * as path from 'path';
+import fastifyStatic from '@fastify/static';
 
 config();
 
@@ -28,8 +30,21 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
   });
 
+  app.register(fastifyStatic, {
+    root: path.join(__dirname, '..', 'uploads'),
+    prefix: '/uploads/',
+    decorateReply: false,
+  });
+
+  app.register(fastifyStatic, {
+    root: path.join(__dirname, '..', 'src', 'utils', 'lang'),
+    prefix: '/lang/',
+    decorateReply: false,
+  });
+
   app.use(cookieParser());
 
   await app.listen(process.env.PORT, '0.0.0.0');
 }
+
 bootstrap();
