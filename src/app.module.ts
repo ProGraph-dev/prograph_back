@@ -13,6 +13,7 @@ import { EmployeeModule } from './modules/employee/employee.module';
 import { ProductTypeModule } from './modules/product-type/product-type.module';
 import { ProductModule } from './modules/product/product.module';
 import { UploadModule } from './utils/modules/upload/upload.module';
+import { ServicesModule } from './modules/services/services.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UploadModule } from './utils/modules/upload/upload.module';
     ProductModule,
     ProductTypeModule,
     UploadModule,
+    ServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
