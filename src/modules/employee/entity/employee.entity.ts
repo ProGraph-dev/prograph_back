@@ -15,8 +15,8 @@ export class Employee {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'varchar' })
-  photo: number;
+  @Column({ type: 'varchar', nullable: true })
+  photo: string;
 
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
