@@ -19,8 +19,9 @@ export class LanguageController {
 
   @Post('/save')
   @UseGuards(IsAdminGuard)
-  private async saveLanguage(@Body() { ISO, path, title }) {
+  private async saveLanguage(@Body() { ISO, title }) {
     try {
+      const path = `/lang/${ISO}.json`;
       const saveRes = await this._languageService.save({ ISO, path, title });
       if (saveRes.statusCode == HttpStatus.CREATED) {
         return saveRes;
@@ -32,8 +33,12 @@ export class LanguageController {
 
   @Put('/update/:id')
   @UseGuards(IsAdminGuard)
-  private async update(@Param('id') id, @Body() { ISO, path, title }) {
+  private async update(@Param('id') id, @Body() { ISO, title }) {
     try {
+      let path;
+      if (ISO) {
+        path = `/lang/${ISO}.json`;
+      }
       const updateRes = await this._languageService.update({
         id,
         ISO,
