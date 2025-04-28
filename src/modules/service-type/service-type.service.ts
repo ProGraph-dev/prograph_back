@@ -1,22 +1,23 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Services } from './entity/services.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { ResponseModel } from 'src/utils/models/response.model';
+import { ServiceType } from './entity/service-type.entity';
 
 @Injectable()
-export class ServicesService {
+export class ServiceTypeService {
   constructor(
-    @InjectRepository(Services) private _srevicesRepo: Repository<Services>,
+    @InjectRepository(ServiceType)
+    private _sreviceTypeRepo: Repository<ServiceType>,
   ) {}
 
   public async save({
     title,
     description,
     ISO,
-  }: DeepPartial<Services>): Promise<ResponseModel<Services>> {
+  }: DeepPartial<ServiceType>): Promise<ResponseModel<ServiceType>> {
     try {
-      const saveRes = await this._srevicesRepo.save({
+      const saveRes = await this._sreviceTypeRepo.save({
         title,
         description,
         ISO,
@@ -30,14 +31,17 @@ export class ServicesService {
   }
 
   public async update(
-    data: DeepPartial<Services>,
-  ): Promise<ResponseModel<Services>> {
+    data: DeepPartial<ServiceType>,
+  ): Promise<ResponseModel<ServiceType>> {
     try {
-      const updateRes = await this._srevicesRepo.update({ id: data.id }, data);
+      const updateRes = await this._sreviceTypeRepo.update(
+        { id: data.id },
+        data,
+      );
       if (updateRes.affected !== 0) {
         return {
           statusCode: HttpStatus.OK,
-          response: await this._srevicesRepo.findOne({
+          response: await this._sreviceTypeRepo.findOne({
             where: { id: data.id },
           }),
         };
@@ -52,9 +56,9 @@ export class ServicesService {
     take: number,
     ISO: string,
     title?: string,
-  ): Promise<ResponseModel<{ list: Services[]; count: number }>> {
+  ): Promise<ResponseModel<{ list: ServiceType[]; count: number }>> {
     try {
-      const query = this._srevicesRepo
+      const query = this._sreviceTypeRepo
         .createQueryBuilder('repo')
         .andWhere('repo.ISO = :ISO', { ISO })
         .andWhere('repo.isActive = TRUE');
@@ -86,9 +90,9 @@ export class ServicesService {
     ISO: string;
     title?: string;
     isActive?: boolean;
-  }): Promise<ResponseModel<{ list: Services[]; count: number }>> {
+  }): Promise<ResponseModel<{ list: ServiceType[]; count: number }>> {
     try {
-      const query = this._srevicesRepo
+      const query = this._sreviceTypeRepo
         .createQueryBuilder('repo')
         .where('repo.ISO = :ISO', { ISO })
         .select(['repo.id', 'repo.title', 'repo.description', 'repo.isActive']);
@@ -113,7 +117,7 @@ export class ServicesService {
 
   public async deleteServices(id: number): Promise<ResponseModel<null>> {
     try {
-      const delRes = await this._srevicesRepo.delete({ id });
+      const delRes = await this._sreviceTypeRepo.delete({ id });
       if (delRes.affected !== 0) {
         return {
           statusCode: HttpStatus.NO_CONTENT,

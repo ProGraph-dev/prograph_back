@@ -10,22 +10,22 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ServicesService } from './services.service';
 import { DeepPartial } from 'typeorm';
-import { Services } from './entity/services.entity';
 import { IsAdminGuard } from 'src/utils/guards/admin.guard';
+import { ServiceType } from './entity/service-type.entity';
+import { ServiceTypeService } from './service-type.service';
 
-@Controller('services')
-export class ServicesController {
-  constructor(private _servicesServ: ServicesService) {}
+@Controller('service-type')
+export class ServiceTypeController {
+  constructor(private _serviceTypeServ: ServiceTypeService) {}
 
   @Post('create')
   @UseGuards(IsAdminGuard)
   private async createService(
-    @Body() { title, description, ISO }: DeepPartial<Services>,
+    @Body() { title, description, ISO }: DeepPartial<ServiceType>,
   ) {
     try {
-      const createRes = await this._servicesServ.save({
+      const createRes = await this._serviceTypeServ.save({
         title,
         description,
         ISO,
@@ -40,9 +40,9 @@ export class ServicesController {
 
   @Put('update')
   @UseGuards(IsAdminGuard)
-  private async updateServices(@Body() data: DeepPartial<Services>) {
+  private async updateServices(@Body() data: DeepPartial<ServiceType>) {
     try {
-      const updateRes = await this._servicesServ.update(data);
+      const updateRes = await this._serviceTypeServ.update(data);
       if (updateRes.statusCode == HttpStatus.OK) {
         return updateRes;
       }
@@ -55,7 +55,7 @@ export class ServicesController {
   private async getServices(@Query() { skip, take, ISO, title }) {
     try {
       title = title.length == 0 ? null : title;
-      const getRes = await this._servicesServ.getLikeTilte(
+      const getRes = await this._serviceTypeServ.getLikeTilte(
         +skip,
         +take,
         ISO,
@@ -78,7 +78,7 @@ export class ServicesController {
       title = title.length == 0 ? null : title;
       isActive =
         isActive === 'true' ? true : isActive === 'false' ? false : null;
-      const getRes = await this._servicesServ.getAllByFilter({
+      const getRes = await this._serviceTypeServ.getAllByFilter({
         skip,
         take,
         ISO,
@@ -97,7 +97,7 @@ export class ServicesController {
   @UseGuards(IsAdminGuard)
   private async deleteServiceForce(@Param('serviceId') serviceId) {
     try {
-      const delRes = await this._servicesServ.deleteServices(serviceId);
+      const delRes = await this._serviceTypeServ.deleteServices(serviceId);
       if (delRes.statusCode == HttpStatus.NO_CONTENT) {
         return delRes;
       }
@@ -110,7 +110,7 @@ export class ServicesController {
   @UseGuards(IsAdminGuard)
   private async deleteService(@Param('serviceId') serviceId) {
     try {
-      const delRes = await this._servicesServ.update({
+      const delRes = await this._serviceTypeServ.update({
         id: serviceId,
         isActive: false,
       });
