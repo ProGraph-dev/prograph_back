@@ -13,6 +13,7 @@ import { EmployeeModule } from './modules/employee/employee.module';
 import { ProductTypeModule } from './modules/product-type/product-type.module';
 import { ProductModule } from './modules/product/product.module';
 import { UploadModule } from './utils/modules/upload/upload.module';
+import { ServiceTypeModule } from './modules/service-type/service-type.module';
 import { ServicesModule } from './modules/services/services.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { ServicesModule } from './modules/services/services.module';
     ProductModule,
     ProductTypeModule,
     UploadModule,
+    ServiceTypeModule,
     ServicesModule,
   ],
   controllers: [AppController],

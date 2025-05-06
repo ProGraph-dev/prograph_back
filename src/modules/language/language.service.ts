@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   BadRequestException,
+  HttpException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -9,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Language } from './entity/language.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { ResponseModel } from 'src/utils/models/response.model';
+import { appendFile } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class LanguageService {
@@ -26,6 +29,23 @@ export class LanguageService {
       if (exist) {
         throw new BadRequestException('Language already exist');
       }
+      const filePath = join(__dirname, '..', 'utils', 'lang', `${ISO}.json`);
+      appendFile(
+        filePath,
+        `{"ISO":"${ISO}","Language":"${title}"}`,
+        function (err) {
+          if (err) {
+            if (err.code == 'ENOENT') {
+              throw new HttpException(
+                'File with same name is exist',
+                HttpStatus.BAD_REQUEST,
+              );
+            }
+            throw err;
+          }
+          console.log('Saved!');
+        },
+      );
       const saveRes = await this._languageRepo.save({ ISO, path, title });
       return { statusCode: HttpStatus.CREATED, response: saveRes };
     } catch (err) {

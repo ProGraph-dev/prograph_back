@@ -13,24 +13,19 @@ import {
 import { ServicesService } from './services.service';
 import { DeepPartial } from 'typeorm';
 import { Services } from './entity/services.entity';
+import { StatusEnum } from 'src/utils/enums/status.enum';
 import { IsAdminGuard } from 'src/utils/guards/admin.guard';
 
 @Controller('services')
 export class ServicesController {
-  constructor(private _servicesServ: ServicesService) {}
+  constructor(private _servicesService: ServicesService) {}
 
   @Post('create')
   @UseGuards(IsAdminGuard)
-  private async createService(
-    @Body() { title, description, ISO }: DeepPartial<Services>,
-  ) {
+  private async create(@Body() args: DeepPartial<Services>) {
     try {
-      const createRes = await this._servicesServ.save({
-        title,
-        description,
-        ISO,
-      });
-      if (createRes.statusCode == HttpStatus.CREATED) {
+      const createRes = await this._servicesService.save(args);
+      if (createRes.statusCode == HttpStatus.OK) {
         return createRes;
       }
     } catch (err) {
@@ -38,11 +33,12 @@ export class ServicesController {
     }
   }
 
-  @Put('update')
+  @Put('update/:id')
   @UseGuards(IsAdminGuard)
-  private async updateServices(@Body() data: DeepPartial<Services>) {
+  private async update(@Body() args: DeepPartial<Services>, @Param('id') id) {
     try {
-      const updateRes = await this._servicesServ.update(data);
+      args.id = +id;
+      const updateRes = await this._servicesService.update(args);
       if (updateRes.statusCode == HttpStatus.OK) {
         return updateRes;
       }
@@ -51,14 +47,27 @@ export class ServicesController {
     }
   }
 
-  @Get('get-list')
-  private async getServices(@Query() { skip, take, ISO, title }) {
+  @Get('get/:id')
+  private async getById(@Param('id') id) {
     try {
-      title = title.length == 0 ? null : title;
-      const getRes = await this._servicesServ.getLikeTilte(
+      const getRes = await this._servicesService.getById(+id);
+      if (getRes.statusCode == HttpStatus.OK) {
+        return getRes;
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  @Get('many')
+  private async getMany(@Query() { ISO, skip, take, title }) {
+    try {
+      const getRes = await this._servicesService.getMany(
+        ISO,
         +skip,
         +take,
-        ISO,
+        StatusEnum.ACTIVE,
+        ['id', 'firstImg', 'title'],
         title,
       );
       if (getRes.statusCode == HttpStatus.OK) {
@@ -69,53 +78,29 @@ export class ServicesController {
     }
   }
 
-  @Get('get-list-admin')
+  @Delete('delete/soft/:id')
   @UseGuards(IsAdminGuard)
-  private async getServicesAdmin(
-    @Query() { skip, take, ISO, title, isActive },
-  ) {
+  private async dleteSoft(@Param('id') id) {
     try {
-      title = title.length == 0 ? null : title;
-      isActive =
-        isActive === 'true' ? true : isActive === 'false' ? false : null;
-      const getRes = await this._servicesServ.getAllByFilter({
-        skip,
-        take,
-        ISO,
-        title,
-        isActive,
+      const updateRes = await this._servicesService.update({
+        id,
+        status: StatusEnum.INACTIVE,
       });
-      if (getRes.statusCode == HttpStatus.OK) {
-        return getRes;
+      if (updateRes.statusCode == HttpStatus.OK) {
+        return updateRes;
       }
     } catch (err) {
       throw err;
     }
   }
 
-  @Delete('delete/hard/:serviceId')
+  @Delete('delete/hard/:id')
   @UseGuards(IsAdminGuard)
-  private async deleteServiceForce(@Param('serviceId') serviceId) {
+  private async dleteHard(@Param('id') id) {
     try {
-      const delRes = await this._servicesServ.deleteServices(serviceId);
-      if (delRes.statusCode == HttpStatus.NO_CONTENT) {
-        return delRes;
-      }
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  @Delete('delete/soft/:serviceId')
-  @UseGuards(IsAdminGuard)
-  private async deleteService(@Param('serviceId') serviceId) {
-    try {
-      const delRes = await this._servicesServ.update({
-        id: serviceId,
-        isActive: false,
-      });
-      if (delRes.statusCode == HttpStatus.OK) {
-        return delRes;
+      const updateRes = await this._servicesService.delete(id);
+      if (updateRes.statusCode == HttpStatus.NO_CONTENT) {
+        return updateRes;
       }
     } catch (err) {
       throw err;

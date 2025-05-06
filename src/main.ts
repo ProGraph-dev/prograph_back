@@ -10,6 +10,7 @@ import {
 import * as cookieParser from 'cookie-parser';
 import * as path from 'path';
 import fastifyStatic from '@fastify/static';
+import { AllExceptionsFilter } from './utils/exceptions/all-exceptions.filter';
 
 config();
 
@@ -41,6 +42,8 @@ async function bootstrap() {
     prefix: '/lang/',
     decorateReply: false,
   });
+
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   app.use(cookieParser());
 

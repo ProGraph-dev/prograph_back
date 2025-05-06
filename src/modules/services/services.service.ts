@@ -1,127 +1,105 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Services } from './entity/services.entity';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, ILike, Repository } from 'typeorm';
+import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler.util';
 import { ResponseModel } from 'src/utils/models/response.model';
+import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
 
 @Injectable()
 export class ServicesService {
   constructor(
-    @InjectRepository(Services) private _srevicesRepo: Repository<Services>,
+    @InjectRepository(Services) private _servicesRepo: Repository<Services>,
   ) {}
 
-  public async save({
-    title,
-    description,
-    ISO,
-  }: DeepPartial<Services>): Promise<ResponseModel<Services>> {
+  public async save(
+    args: DeepPartial<Services>,
+  ): Promise<ResponseModel<Services>> {
     try {
-      const saveRes = await this._srevicesRepo.save({
-        title,
-        description,
-        ISO,
-      });
-      if (saveRes) {
-        return { statusCode: HttpStatus.CREATED, response: saveRes };
-      }
+      console.log({ args });
+
+      const saveRes = await this._servicesRepo.save(args);
+      return { response: saveRes, statusCode: HttpStatus.CREATED };
     } catch (err) {
-      throw err;
+      console.log({ err });
+
+      handlePostgresError(err);
     }
   }
 
   public async update(
-    data: DeepPartial<Services>,
+    args: DeepPartial<Services>,
   ): Promise<ResponseModel<Services>> {
     try {
-      const updateRes = await this._srevicesRepo.update({ id: data.id }, data);
+      assertFound(await this._servicesRepo.exists({ where: { id: args.id } }));
+      const updateRes = await this._servicesRepo.update({ id: args.id }, args);
       if (updateRes.affected !== 0) {
         return {
           statusCode: HttpStatus.OK,
-          response: await this._srevicesRepo.findOne({
-            where: { id: data.id },
+          response: await this._servicesRepo.findOne({
+            where: { id: args.id },
           }),
         };
       }
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
-  public async getLikeTilte(
+  public async getById(id: number): Promise<ResponseModel<Services>> {
+    try {
+      const getRes = assertFound(
+        await this._servicesRepo.findOne({
+          where: { id },
+          select: {
+            creator: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatar: true,
+            },
+          },
+          relations: { creator: true },
+        }),
+      );
+      return { statusCode: HttpStatus.OK, response: getRes };
+    } catch (err) {
+      handlePostgresError(err);
+    }
+  }
+
+  public async getMany(
+    ISO: string,
     skip: number,
     take: number,
-    ISO: string,
+    status: number,
+    selectFields?: (keyof Services)[],
     title?: string,
   ): Promise<ResponseModel<{ list: Services[]; count: number }>> {
     try {
-      const query = this._srevicesRepo
-        .createQueryBuilder('repo')
-        .andWhere('repo.ISO = :ISO', { ISO })
-        .andWhere('repo.isActive = TRUE');
-      if (title) {
-        query.andWhere('LOWER(repo.title) LIKE LOWER(:title)', {
-          title: '%' + title.toLowerCase() + '%',
-        });
-      }
-      const [list, count] = await query
-        .skip(skip)
-        .take(take)
-        .orderBy('repo.title', 'ASC')
-        .getManyAndCount();
-      return { statusCode: HttpStatus.OK, response: { list, count } };
+      const [list, count] = await this._servicesRepo.findAndCount({
+        where: { title: ILike(`%${title}%`), status, ISO },
+        skip,
+        take,
+      });
+      return { response: { list, count }, statusCode: HttpStatus.OK };
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
-  public async getAllByFilter({
-    skip,
-    take,
-    ISO,
-    title,
-    isActive,
-  }: {
-    skip: number;
-    take: number;
-    ISO: string;
-    title?: string;
-    isActive?: boolean;
-  }): Promise<ResponseModel<{ list: Services[]; count: number }>> {
+  public async delete(id: number): Promise<ResponseModel<null>> {
     try {
-      const query = this._srevicesRepo
-        .createQueryBuilder('repo')
-        .where('repo.ISO = :ISO', { ISO })
-        .select(['repo.id', 'repo.title', 'repo.description', 'repo.isActive']);
-      if (isActive !== null) {
-        query.andWhere('repo.isActive = :isActive', { isActive });
-      }
-      if (title) {
-        query.andWhere('LOWER(repo.title) LIKE LOWER(:title)', {
-          title: `%${title.toLowerCase()}%`,
-        });
-      }
-      const [list, count] = await query
-        .skip(skip)
-        .take(take)
-        .orderBy('repo.title', 'ASC')
-        .getManyAndCount();
-      return { statusCode: HttpStatus.OK, response: { list, count } };
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  public async deleteServices(id: number): Promise<ResponseModel<null>> {
-    try {
-      const delRes = await this._srevicesRepo.delete({ id });
-      if (delRes.affected !== 0) {
+      assertFound(await this._servicesRepo.exists({ where: { id } }));
+      const deleteRes = await this._servicesRepo.delete({ id });
+      if (deleteRes.affected !== 0) {
         return {
           statusCode: HttpStatus.NO_CONTENT,
           message: 'Data successfully deleted',
         };
       }
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 }

@@ -1,10 +1,13 @@
 import { Employee } from 'src/modules/employee/entity/employee.entity';
 import { Profession } from 'src/modules/proffesion/entity/profession.entity';
+import { Services } from 'src/modules/services/entity/services.entity';
 import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -37,4 +40,15 @@ export class User {
 
   @OneToOne(() => Employee)
   employeeDesc: Employee;
+
+  @ManyToMany(() => Services, (services) => services.viewer)
+  @JoinTable({ name: 'user_view_service' })
+  public viewedService: Services[];
+
+  @ManyToMany(() => Services, (services) => services.liker)
+  @JoinTable({ name: 'user_like_service' })
+  public likedService: Services[];
+
+  @OneToMany(() => Services, (serv) => serv.creator)
+  public service: Services[];
 }
