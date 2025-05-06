@@ -23,7 +23,7 @@ export class Services {
   @Column({ type: 'varchar', length: 255 })
   public img: string;
 
-  @Column({ type: 'varchar', default: 'EN', length: 3 })
+  @Column({ type: 'varchar', default: 'EN', length: 3, select: false })
   public ISO: string;
 
   @ManyToMany(() => User, (user) => user.likedService)
@@ -38,6 +38,6 @@ export class Services {
   @JoinColumn({ name: 'creatorId' })
   public creator: User;
 
-  @Column({ type: 'integer', length: 2, default: 1 })
+  @Column({ type: 'smallint', default: 1, select: false })
   public status: number;
 }

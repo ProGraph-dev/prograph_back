@@ -13,7 +13,8 @@ import { EmployeeModule } from './modules/employee/employee.module';
 import { ProductTypeModule } from './modules/product-type/product-type.module';
 import { ProductModule } from './modules/product/product.module';
 import { UploadModule } from './utils/modules/upload/upload.module';
-import { ServicesModule } from './modules/service-type/service-type.module';
+import { ServiceTypeModule } from './modules/service-type/service-type.module';
+import { ServicesModule } from './modules/services/services.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ServicesModule } from './modules/service-type/service-type.module';
     ProductModule,
     ProductTypeModule,
     UploadModule,
+    ServiceTypeModule,
     ServicesModule,
   ],
   controllers: [AppController],
