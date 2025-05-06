@@ -8,6 +8,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+/**
+ * Interprets and handles PostgreSQL error codes by throwing appropriate HTTP exceptions.
+ *
+ * This function maps specific PostgreSQL error codes (e.g., unique violations, null constraints,
+ * foreign key violations, etc.) to meaningful HTTP exceptions such as `BadRequestException`,
+ * `ConflictException`, `UnauthorizedException`, and others.
+ *
+ * This improves API error responses by translating low-level database errors into
+ * readable and client-friendly messages.
+ *
+ * @param error - The PostgreSQL error object typically caught in a `try-catch` block.
+ * @throws An appropriate NestJS HTTP exception based on the error code.
+ *         If the error code is not recognized, the original error is thrown.
+ */
 export function handlePostgresError(error: any): never {
   const code = error?.code;
   switch (code) {
