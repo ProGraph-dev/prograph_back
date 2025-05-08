@@ -56,7 +56,7 @@ export class ProjectController {
       if (!checkRes.project_exist) {
         throw new HttpException('Project is not found', HttpStatus.NOT_FOUND);
       }
-      if (!checkRes.is_customer || user.userRole <= UserRoleEnum.SUPPORT) {
+      if (!checkRes.is_customer || user.userRole >= UserRoleEnum.SUPPORT) {
         throw new HttpException(
           'you dont have permision for this request',
           HttpStatus.FORBIDDEN,
