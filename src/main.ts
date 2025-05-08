@@ -11,6 +11,7 @@ import * as cookieParser from 'cookie-parser';
 import * as path from 'path';
 import fastifyStatic from '@fastify/static';
 import { AllExceptionsFilter } from './utils/exceptions/all-exceptions.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 config();
 
@@ -44,6 +45,14 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   app.use(cookieParser());
 

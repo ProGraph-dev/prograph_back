@@ -36,6 +36,8 @@
     "@nestjs/typeorm": "^10.0.2",
     "adminjs": "^7.8.1",
     "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.6",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

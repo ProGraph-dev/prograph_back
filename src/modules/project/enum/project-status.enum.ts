@@ -1,0 +1,12 @@
+export enum ProjectStatusEnum {
+  DELETED = 0,
+  DONE = 10,
+  CANCELED = 20,
+  FAILED = 30,
+  PAYMENT = 40,
+  FINISHED = 50,
+  PROGRAMMING = 60,
+  CONFIRMATION = 70,
+  DESIGN_DEVELOPMENT = 80,
+  ORDERED = 90,
+}

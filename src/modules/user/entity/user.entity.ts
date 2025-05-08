@@ -1,5 +1,6 @@
 import { Employee } from 'src/modules/employee/entity/employee.entity';
 import { Profession } from 'src/modules/proffesion/entity/profession.entity';
+import { Project } from 'src/modules/project/entity/project.entity';
 import { Services } from 'src/modules/services/entity/services.entity';
 import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
 import {
@@ -51,4 +52,7 @@ export class User {
 
   @OneToMany(() => Services, (serv) => serv.creator)
   public service: Services[];
+
+  @OneToMany(() => Project, (project) => project.customer)
+  public projects: Project[];
 }

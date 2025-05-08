@@ -16,10 +16,10 @@ export class ServicesService {
     args: DeepPartial<Services>,
   ): Promise<ResponseModel<Services>> {
     try {
-      console.log({ args });
-
       const saveRes = await this._servicesRepo.save(args);
-      return { response: saveRes, statusCode: HttpStatus.CREATED };
+      if (saveRes) {
+        return { response: saveRes, statusCode: HttpStatus.CREATED };
+      }
     } catch (err) {
       console.log({ err });
 
