@@ -9,7 +9,7 @@ export class Achievement {
   title: string;
 
   @Column({ type: 'integer' })
-  count: string;
+  count: number;
 
   @Column({ type: 'boolean', default: true })
   is_active: boolean;

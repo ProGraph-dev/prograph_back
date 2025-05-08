@@ -1,14 +1,10 @@
-import {
-  BadGatewayException,
-  BadRequestException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { ResponseModel } from 'src/utils/models/response.model';
 import { Achievement } from './entity/achievement.entity';
+import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler.util';
+import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
 
 @Injectable()
 export class AchievementService {
@@ -25,8 +21,9 @@ export class AchievementService {
     try {
       const exists = await this._achievementRepo.exists({ where: { title } });
       if (exists) {
-        throw new BadRequestException(
+        throw new HttpException(
           `Achievement with ${title} title is exist`,
+          HttpStatus.BAD_REQUEST,
         );
       }
       const saveRes = await this._achievementRepo.save({
@@ -36,7 +33,7 @@ export class AchievementService {
       });
       return { statusCode: HttpStatus.CREATED, response: saveRes };
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
@@ -47,15 +44,21 @@ export class AchievementService {
     is_active,
   }: DeepPartial<Achievement>): Promise<ResponseModel<Achievement>> {
     try {
-      const existsId = await this._achievementRepo.exists({ where: { id } });
-      if (!existsId) {
-        throw new NotFoundException('Achievement with this id is not found');
-      }
-      const existsTitle = await this._achievementRepo.exists({
-        where: { title },
-      });
-      if (existsTitle) {
-        throw new BadRequestException('Achievement with same title is exist');
+      console.log(title);
+      assertFound(
+        await this._achievementRepo.exists({ where: { id } }),
+        'Achievement with this id is not found',
+      );
+
+      if (
+        await this._achievementRepo.exists({
+          where: { title },
+        })
+      ) {
+        throw new HttpException(
+          'Achievement with same title is exist',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       await this._achievementRepo.update({ id }, { count, title, is_active });
       const achievement = await this._achievementRepo.findOne({
@@ -63,7 +66,7 @@ export class AchievementService {
       });
       return { statusCode: HttpStatus.OK, response: achievement };
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
@@ -71,13 +74,13 @@ export class AchievementService {
     id,
   }: DeepPartial<Achievement>): Promise<ResponseModel<Achievement>> {
     try {
-      const getRes = await this._achievementRepo.findOne({ where: { id } });
-      if (!getRes) {
-        throw new NotFoundException('Achievement whith that id is not found');
-      }
+      const getRes = assertFound(
+        await this._achievementRepo.findOne({ where: { id } }),
+        'Achievement whith that id is not found',
+      );
       return { statusCode: HttpStatus.OK, response: getRes };
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
@@ -96,7 +99,7 @@ export class AchievementService {
       });
       return { statusCode: HttpStatus.OK, response: { list, count } };
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 
@@ -104,10 +107,10 @@ export class AchievementService {
     id,
   }: DeepPartial<Achievement>): Promise<ResponseModel<null>> {
     try {
-      const exists = await this._achievementRepo.exists({ where: { id } });
-      if (!exists) {
-        throw new NotFoundException('Achievement is not found');
-      }
+      assertFound(
+        await this._achievementRepo.exists({ where: { id } }),
+        'Achievement is not found',
+      );
       const delRes = await this._achievementRepo.delete({ id });
       if (delRes.affected !== 0) {
         return {
@@ -115,10 +118,10 @@ export class AchievementService {
           message: 'Content successfully deleted',
         };
       } else {
-        throw new BadGatewayException('Somethink is wrong');
+        throw new HttpException('Somethink is wrong', HttpStatus.BAD_GATEWAY);
       }
     } catch (err) {
-      throw err;
+      handlePostgresError(err);
     }
   }
 }
