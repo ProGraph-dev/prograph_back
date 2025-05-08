@@ -25,7 +25,7 @@ export class ServicesController {
   private async create(@Body() args: DeepPartial<Services>) {
     try {
       const createRes = await this._servicesService.save(args);
-      if (createRes.statusCode == HttpStatus.OK) {
+      if (createRes.statusCode == HttpStatus.CREATED) {
         return createRes;
       }
     } catch (err) {

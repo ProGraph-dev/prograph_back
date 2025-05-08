@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entity/project.entity';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler.util';
 import { ResponseModel } from 'src/utils/models/response.model';
 import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
@@ -45,9 +45,67 @@ export class ProjectService {
   public async getById(id: number): Promise<ResponseModel<Project>> {
     try {
       const getRes = assertFound(
-        await this._projectRepo.findOne({ where: { id } }),
+        await this._projectRepo.findOne({
+          where: { id },
+          relations: { customer: true },
+          select: {
+            customer: {
+              id: true,
+              avatar: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        }),
       );
       return { statusCode: HttpStatus.OK, response: getRes };
+    } catch (err) {
+      handlePostgresError(err);
+    }
+  }
+
+  public async CheckPidAndCid({
+    project_id,
+    customer_id,
+  }: {
+    project_id: number;
+    customer_id: number;
+  }): Promise<{ project_exist: boolean; is_customer: boolean }> {
+    try {
+      const project_exist = await this._projectRepo.exists({
+        where: { id: project_id },
+      });
+      const is_customer = await this._projectRepo.exists({
+        where: { id: project_id, customer: { id: customer_id } },
+      });
+      return { project_exist, is_customer };
+    } catch (err) {
+      handlePostgresError(err);
+    }
+  }
+
+  public async getMany(
+    skip: number,
+    take: number,
+    title?: string,
+  ): Promise<ResponseModel<{ list: Project[]; count: number }>> {
+    try {
+      const fields: FindOptionsWhere<Project> = !title
+        ? {}
+        : {
+            title: ILike(`%${title}%`),
+          };
+      const [list, count] = await this._projectRepo.findAndCount({
+        where: fields,
+        order: { createdAt: 'DESC' },
+        skip,
+        take,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        response: { list, count },
+      };
     } catch (err) {
       handlePostgresError(err);
     }
@@ -57,10 +115,17 @@ export class ProjectService {
     customer_id: number,
     skip: number,
     take: number,
+    title?: string,
   ): Promise<ResponseModel<{ list: Project[]; count: number }>> {
     try {
+      const fields: FindOptionsWhere<Project> = !title
+        ? { customer: { id: customer_id } }
+        : {
+            customer: { id: customer_id },
+            title: ILike(`%${title}%`),
+          };
       const [list, count] = await this._projectRepo.findAndCount({
-        where: { customer: { id: customer_id } },
+        where: fields,
         skip,
         take,
       });

@@ -1,4 +1,5 @@
 export enum ProjectStatusEnum {
+  DELETED = 0,
   DONE = 10,
   CANCELED = 20,
   FAILED = 30,

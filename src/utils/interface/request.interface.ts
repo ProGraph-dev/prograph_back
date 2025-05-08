@@ -1,10 +1,10 @@
-import { User } from 'src/modules/user/entity/user.entity';
 import { CookieModel } from '../models/cookie.model';
+import { CurrentUserInteface } from './current-user.interface';
 
 export interface ReqInterface extends Request {
   cookies: CookieModel;
   cookie: CookieModel;
-  user: User;
+  user: CurrentUserInteface;
   params: any;
   raw: any;
 }

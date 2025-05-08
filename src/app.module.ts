@@ -15,6 +15,7 @@ import { ProductModule } from './modules/product/product.module';
 import { UploadModule } from './utils/modules/upload/upload.module';
 import { ServiceTypeModule } from './modules/service-type/service-type.module';
 import { ServicesModule } from './modules/services/services.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ServicesModule } from './modules/services/services.module';
     UploadModule,
     ServiceTypeModule,
     ServicesModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService],
