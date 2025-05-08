@@ -5,6 +5,7 @@ import { DeepPartial, Repository } from 'typeorm';
 import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler.util';
 import { ResponseModel } from 'src/utils/models/response.model';
 import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
+import { ProjectStatusEnum } from '../project/enum/project-status.enum';
 
 @Injectable()
 export class ChatService {
@@ -45,5 +46,16 @@ export class ChatService {
     } catch (err) {
       handlePostgresError(err);
     }
+  }
+
+  public async getChatIdsByUser(user_id: number): Promise<{ id: number }[]> {
+    const chatsIds: { id: number }[] = await this._chatRepo.query(`
+            SELECT ch."id"
+            FROM chat_user cu
+            LEFT JOIN chat ch ON ch."id" = cu."chatId"
+            LEFT JOIN project pj ON pj."id" = cu."chatId"
+            WHERE cu."userId" = ${user_id} AND pj.status >= ${ProjectStatusEnum.PAYMENT};
+        `);
+    return chatsIds;
   }
 }

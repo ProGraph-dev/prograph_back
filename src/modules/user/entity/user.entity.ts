@@ -1,3 +1,5 @@
+import { Chat } from 'src/modules/chat/entity/chat.entity';
+import { Message } from 'src/modules/chat/entity/message.entity';
 import { Employee } from 'src/modules/employee/entity/employee.entity';
 import { Profession } from 'src/modules/proffesion/entity/profession.entity';
 import { Project } from 'src/modules/project/entity/project.entity';
@@ -30,7 +32,7 @@ export class User {
   @Column({ type: 'varchar' })
   email: string;
 
-  @Column({ type: 'integer', default: UserRoleEnum.USER })
+  @Column({ type: 'integer', enum: UserRoleEnum, default: UserRoleEnum.USER })
   userRole: number;
 
   @Column({ type: 'varchar', select: false })
@@ -55,4 +57,15 @@ export class User {
 
   @OneToMany(() => Project, (project) => project.customer)
   public projects: Project[];
+
+  @ManyToMany(() => Chat, (chat) => chat.users)
+  @JoinTable({ name: 'chat_user' })
+  public chats: Chat[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  public messages: Message[];
+
+  @ManyToMany(() => Message, (message) => message.readers)
+  @JoinTable({ name: 'user_readed_mesages' })
+  public readedMesages: Message[];
 }

@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { ResponseModel } from 'src/utils/models/response.model';
+import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler.util';
+import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
 
 @Injectable()
 export class UserService {
@@ -42,6 +44,27 @@ export class UserService {
       return { statusCode: HttpStatus.OK, response: user };
     } catch (err) {
       throw err;
+    }
+  }
+
+  public async getUserForChat(user_id: number): Promise<ResponseModel<User>> {
+    try {
+      const getRes = assertFound(
+        await this._userRepo.findOne({
+          where: { id: user_id },
+          select: {
+            id: true,
+            avatar: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            userRole: true,
+          },
+        }),
+      );
+      return { statusCode: HttpStatus.OK, response: getRes };
+    } catch (err) {
+      handlePostgresError(err);
     }
   }
 
