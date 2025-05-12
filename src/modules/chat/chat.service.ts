@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chat } from './entity/chat.entity';
 import { DeepPartial, Repository } from 'typeorm';
@@ -15,14 +15,58 @@ export class ChatService {
     @InjectRepository(Message) private _messageRepo: Repository<Message>,
   ) {}
 
-  public async saveChat(args: DeepPartial<Chat>): Promise<ResponseModel<Chat>> {
+  public async saveChat(
+    project_id: number,
+    user_ids: number[],
+  ): Promise<ResponseModel<Chat>> {
+    const queryRunner = this._chatRepo.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      const saveRes = await this._chatRepo.save(args);
-      if (saveRes) {
-        return { response: saveRes, statusCode: HttpStatus.CREATED };
+      const insertedChat = await queryRunner.query(
+        `INSERT INTO chat ("projectId") VALUES ($1) RETURNING *`,
+        [project_id],
+      );
+      const chat = insertedChat[0];
+      if (!chat?.id) {
+        throw new Error('Chat insert failed');
       }
+      if (!user_ids.length) {
+        throw new Error('No users provided for the chat');
+      }
+      const insertValues = user_ids
+        .map((_, i) => `($${i * 2 + 1}, $${i * 2 + 2})`)
+        .join(',');
+      const insertParams = user_ids.flatMap((userId) => [userId, chat.id]);
+      await queryRunner.query(
+        `INSERT INTO chat_user ("userId", "chatId") VALUES ${insertValues}`,
+        insertParams,
+      );
+      const result = await queryRunner.query(
+        `
+        SELECT json_build_object(
+          'id', c.id,
+          'project', json_build_object(
+            'id', p.id,
+            'title', p.title
+          )
+        ) AS result
+        FROM chat c
+        LEFT JOIN project p ON p.id = c."projectId"
+        WHERE c.id = $1
+        `,
+        [chat.id],
+      );
+      await queryRunner.commitTransaction();
+      return { response: result[0].result, statusCode: HttpStatus.CREATED };
     } catch (err) {
-      handlePostgresError(err);
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        'Failed to create chat',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 
