@@ -1,8 +1,15 @@
 export enum UserRoleEnum {
   SUPER_ADMIN = 0,
   ADMIN = 10,
-  MODERATOR = 30,
-  SUPPORT = 50,
-  DEVELOPER = 55,
+  HR = 20,
+  PROJECT_MANAGER = 30,
+  TEAM_LEAD = 40,
+  BUSINESS_ANALYST = 45,
+  DESIGNER = 50,
+  QA = 55,
+  DEVELOPER = 60,
+  DEVOPS = 65,
+  SUPPORT = 70,
+  MODERATOR = 80,
   USER = 100,
 }

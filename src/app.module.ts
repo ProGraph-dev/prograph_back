@@ -17,6 +17,7 @@ import { ServiceTypeModule } from './modules/service-type/service-type.module';
 import { ServicesModule } from './modules/services/services.module';
 import { ProjectModule } from './modules/project/project.module';
 import { AchievementModule } from './modules/achievements/achievements.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { AchievementModule } from './modules/achievements/achievements.module';
     ServiceTypeModule,
     ServicesModule,
     ProjectModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

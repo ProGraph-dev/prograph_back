@@ -98,6 +98,10 @@ export class ProjectService {
           };
       const [list, count] = await this._projectRepo.findAndCount({
         where: fields,
+        select: {
+          customer: { id: true, avatar: true, firstName: true, lastName: true },
+        },
+        relations: { customer: true },
         order: { createdAt: 'DESC' },
         skip,
         take,

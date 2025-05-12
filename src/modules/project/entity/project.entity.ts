@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectStatusEnum } from '../enum/project-status.enum';
+import { Chat } from 'src/modules/chat/entity/chat.entity';
 
 @Entity('project')
 export class Project {
@@ -32,4 +34,8 @@ export class Project {
   @ManyToOne(() => User, (user) => user.projects)
   @JoinColumn({ name: 'customerId' })
   public customer: User;
+
+  @OneToOne(() => Chat, (chat) => chat.project)
+  @JoinColumn({ name: 'chatId' })
+  public chat: Chat;
 }
