@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { User } from '../user/entity/user.entity';
 import { CurrentUser } from 'src/utils/decorators/current-user.decorator';
 import { Response } from 'express';
+import { DeepPartial } from 'typeorm';
 
 @Controller('auth')
 export class AuthController {
@@ -24,15 +25,29 @@ export class AuthController {
   }
 
   @Post('/login')
-  private async Login(@Body() { email, password }: User, @Res() res: Response) {
+  private async Login(
+    @Body() { email, password }: DeepPartial<User>,
+    @Res() res: Response,
+  ) {
     try {
       const loginRes = await this._authService.login({ email, password });
-      if (loginRes.statusCode == HttpStatus.OK) {
-        res.cookie('access_token', loginRes.response.token, { httpOnly: true });
+
+      if (loginRes.statusCode === HttpStatus.OK) {
+        res.cookie('access_token', loginRes.response.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+        });
         return res.status(HttpStatus.OK).send(loginRes);
       }
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .send({ message: 'Invalid credentials' });
     } catch (err) {
-      throw err;
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Login error',
+        error: err.message,
+      });
     }
   }
 

@@ -6,12 +6,16 @@ import { handlePostgresError } from 'src/utils/exceptions/postgres-error-handler
 import { ResponseModel } from 'src/utils/models/response.model';
 import { assertFound } from 'src/utils/exceptions/all-exceptions.filter';
 import { ProjectStatusEnum } from '../project/enum/project-status.enum';
+import { Message } from './entity/message.entity';
 
 @Injectable()
 export class ChatService {
-  constructor(@InjectRepository(Chat) private _chatRepo: Repository<Chat>) {}
+  constructor(
+    @InjectRepository(Chat) private _chatRepo: Repository<Chat>,
+    @InjectRepository(Message) private _messageRepo: Repository<Message>,
+  ) {}
 
-  public async save(args: DeepPartial<Chat>): Promise<ResponseModel<Chat>> {
+  public async saveChat(args: DeepPartial<Chat>): Promise<ResponseModel<Chat>> {
     try {
       const saveRes = await this._chatRepo.save(args);
       if (saveRes) {
@@ -22,7 +26,9 @@ export class ChatService {
     }
   }
 
-  public async update(args: DeepPartial<Chat>): Promise<ResponseModel<Chat>> {
+  public async updateChat(
+    args: DeepPartial<Chat>,
+  ): Promise<ResponseModel<Chat>> {
     try {
       assertFound(await this._chatRepo.exists({ where: { id: args.id } }));
       const updateRes = await this._chatRepo.update({ id: args.id }, args);
@@ -57,5 +63,22 @@ export class ChatService {
             WHERE cu."userId" = ${user_id} AND pj.status >= ${ProjectStatusEnum.PAYMENT};
         `);
     return chatsIds;
+  }
+
+  public async saveMessage(
+    args: DeepPartial<Message>,
+  ): Promise<ResponseModel<Message>> {
+    try {
+      const saveRes = await this._messageRepo.save(args);
+      if (saveRes) {
+        await this._chatRepo.query(`
+          INSERT INTO user_readed_mesages ("messageId", "userId")
+          VALUES (${saveRes.id}, ${args.sender.id})
+          `);
+        return { statusCode: HttpStatus.CREATED, response: saveRes };
+      }
+    } catch (err) {
+      handlePostgresError(err);
+    }
   }
 }

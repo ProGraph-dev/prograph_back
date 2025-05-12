@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-// import { User } from 'src/modules/user/entity/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { ReqInterface } from '../interface/request.interface';
 

@@ -1,8 +1,12 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { verify, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
@@ -10,6 +14,7 @@ import { ChatService } from './chat.service';
 import { SocketInterface } from 'src/utils/interface/socket.interface';
 import { UserService } from '../user/user.service';
 import { HttpStatus } from '@nestjs/common';
+import { MessageIntefce } from './interface/message.inteface';
 
 @WebSocketGateway({
   cors: {
@@ -66,5 +71,36 @@ export class ChatGateway implements OnGatewayDisconnect, OnGatewayConnection {
 
   public async handleDisconnect(socket: SocketInterface) {
     socket.disconnect(true);
+  }
+
+  @SubscribeMessage('message')
+  private async message(
+    @MessageBody()
+    { type, text, url, chat }: MessageIntefce,
+    @ConnectedSocket()
+    socket: SocketInterface,
+  ) {
+    try {
+      const savedMessage = await this._chatService.saveMessage({
+        chat: { id: chat.id },
+        sender: { id: socket.user.id },
+        type: type,
+        text: text,
+        url: url,
+      });
+      if (savedMessage.statusCode == HttpStatus.OK) {
+        this.server.to(`chat_${chat.id}`).emit('message', {
+          type,
+          text,
+          url,
+          chat,
+          sender: socket.user,
+          createdAt: savedMessage.response.createdAt,
+        });
+      }
+    } catch (err) {
+      console.error('Error in message event:', err);
+      throw new WsException('Failed to process message');
+    }
   }
 }
