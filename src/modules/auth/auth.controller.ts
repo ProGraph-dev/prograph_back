@@ -3,14 +3,14 @@ import { AuthService } from './auth.service';
 import { User } from '../user/entity/user.entity';
 import { CurrentUser } from 'src/utils/decorators/current-user.decorator';
 import { Response } from 'express';
-import { DeepPartial } from 'typeorm';
+import { LogAndRegDTO } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private _authService: AuthService) {}
 
   @Post('/registration')
-  private async registration(@Body() { email, password }: User) {
+  private async registration(@Body() { email, password }: LogAndRegDTO) {
     try {
       const regRes = await this._authService.registreation({
         email,
@@ -26,7 +26,7 @@ export class AuthController {
 
   @Post('/login')
   private async Login(
-    @Body() { email, password }: DeepPartial<User>,
+    @Body() { email, password }: LogAndRegDTO,
     @Res() res: Response,
   ) {
     try {
