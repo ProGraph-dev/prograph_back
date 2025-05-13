@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { CreateChatDTO } from './dto/chat.dto';
 import { ChatService } from './chat.service';
@@ -32,6 +40,26 @@ export class ChatController {
             .status(createChatRes.statusCode)
             .send(createChatRes.response);
         }
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  @Get('my/list')
+  private async getMyChatList(
+    @CurrentUser() user: CurrentUserInteface,
+    @Query() { skip, take },
+    @Res() reply: FastifyReply,
+  ) {
+    try {
+      const getRes = await this._chatService.getChatListByUser(
+        user.id,
+        +skip,
+        +take,
+      );
+      if (getRes.statusCode == HttpStatus.OK) {
+        return reply.send(getRes.response).status(getRes.statusCode);
       }
     } catch (err) {
       throw err;

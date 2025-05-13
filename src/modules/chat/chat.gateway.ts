@@ -88,7 +88,7 @@ export class ChatGateway implements OnGatewayDisconnect, OnGatewayConnection {
         text: text,
         url: url,
       });
-      if (savedMessage.statusCode == HttpStatus.OK) {
+      if (savedMessage.statusCode == HttpStatus.CREATED) {
         this.server.to(`chat_${chat.id}`).emit('message', {
           type,
           text,
