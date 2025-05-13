@@ -103,13 +103,6 @@ export class ChatService {
   }
 
   public async getChatIdsByUser(user_id: number): Promise<{ id: number }[]> {
-    // const chatsIds: { id: number }[] = await this._chatRepo.query(`
-    //         SELECT ch."id"
-    //         FROM chat_user cu
-    //         LEFT JOIN chat ch ON ch."id" = cu."chatId"
-    //         LEFT JOIN project pj ON pj."id" = cu."chatId"
-    //         WHERE cu."userId" = ${user_id} AND pj.status >= ${ProjectStatusEnum.PAYMENT};
-    //     `);
     const chatsIds = await this._chatRepo
       .createQueryBuilder('chat')
       .leftJoin('chat.users', 'user')
